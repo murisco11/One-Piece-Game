@@ -1,0 +1,94 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #222;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 80vw;
+    margin: 20px;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.times {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.time {
+    display: flex;
+    flex-direction: row; /* Alterado para row */
+    margin: 0 auto;
+    align-items: center;
+}
+
+.inimigo,
+.aliado {
+    width: 200px; /* Aumenta o tamanho dos personagens */
+    height: 200px; /* Aumenta o tamanho dos personagens */
+    background-color: #444;
+    margin-right: 10px; /* Espaçamento entre os personagens */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.personagem-img {
+    width: 150px; /* Tamanho da imagem */
+    height: 150px; /* Tamanho da imagem */
+    border-radius: 50%; /* Faz a imagem circular */
+    margin-bottom: 10px;
+}
+
+.nome-hp {
+    background-color: red;
+    font-size: 14px; /* Tamanho menor para o texto */
+    margin: 10px;
+}
+
+.moveset {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.moves {
+    height: 150px;
+    flex: 1;
+    background-color: #555;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#textMoves {
+    flex: 2;
+    background-color: #666;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Exemplo de seleção de personagem */
+.inimigoSelecionado {
+    border: 3px solid blueviolet;
+}
+
+.aliadoSelecionado {
+    border: 3px solid grey;
+}
