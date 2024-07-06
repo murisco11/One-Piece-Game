@@ -8,7 +8,7 @@ function Personagem(time, nome, hp, atk, def, speed, move1, move2, move3, estado
     this.speed = speed
     this.move1 = { nome: move1[0], poder: move1[1], pp: move1[2], calcularDano: () => this.atk * this.move1.poder }
     this.move2 = { nome: move2[0], poder: move2[1], pp: move2[2], calcularDano: () => this.atk * this.move2.poder }
-    this.move3 = { nome: move3[0], poder: move3[1], pp: move3[2], tipo: move3[3], atk: move3[4], calcularDano: () => this.atk * this.move3.poder }
+    this.move3 = { nome: move3[0], poder: move3[1], pp: move3[2], tipo: move3[3], atk: move3[4], calcularDano: () => Math.round(this.atk * this.move3.poder - inimigoSelecionado.def) }
     this.estado = 'vivo'
     this.arrayMoves = [this.useMove1.bind(this), this.useMove2.bind(this), this.useMove3.bind(this)]
 }
@@ -63,57 +63,38 @@ Personagem.prototype.useMove3 = function () {
         textoAtualizando((`${this.nome} está morto e não pode atacar!`))
         return
     }
-    if (move3[3] === 1) {
+    if (this.move3.tipo === 1) {
         textoAtualizando((`${this.nome} Atacou!`))
-        if (this.time === 'aliado') {
-            inimigoSelecionado = personagensInimigos
-        } else {
-            inimigoSelecionado = personagensAliados
-        }
-        if (personagensAliados.length === 1) {
-            textoAtualizando((`O ataque utilizado foi ${this.move3[0]} em área!`))
-            textoAtualizando((`O ${inimigoSelecionado[0].nome} recebeu ${this.move3.calcularDano()} de dano`))
-            inimigoSelecionado.hp -= this.move3.calcularDano()
-            movesetSetado()
-            personagensColocados()
-            verificarMorte()
-        } else {
-            textoAtualizando((`O ataque utilizado foi ${this.move3.nome} em área!`))
-            textoAtualizando((`O ${inimigoSelecionado[0].nome} recebeu ${this.move3.calcularDano()} de dano`))
-            textoAtualizando(`O ${inimigoSelecionado[1].nome} recebeu ${this.move3.calcularDano()} de dano`)
-            inimigoSelecionado[0].hp -= this.move3.calcularDano()
-            inimigoSelecionado[1].hp -= this.move3.calcularDano()
-            inimigoSelecionado[0].speed -= 0.8
-            inimigoSelecionado[1].speed -= 0.8
-            movesetSetado()
-            personagensColocados()
-            verificarMorte()
-        }
-    }
-    if (move3[3] === 2) {
-        textoAtualizando(`${this.nome} se transformou em ${move3[0]}!`)
+        let alvoInimigos = this.time === 'aliado' ? personagensInimigos : personagensAliados
+        textoAtualizando((`O ataque utilizado foi ${this.move3.nome} em área!`))
+        alvoInimigos.forEach(inimigo => {
+            textoAtualizando((`O ${inimigo.nome} recebeu ${this.move3.calcularDano()} de dano`))
+            inimigo.hp -= this.move3.calcularDano()
+            inimigo.speed -= 0.8
+        })
+        movesetSetado()
+        personagensColocados()
+        verificarMorte()
+    } else if (this.move3.tipo === 2) {
+        textoAtualizando(`${this.nome} se transformou em ${this.move3.nome}!`)
         this.speed *= 1.5
         this.atk *= 1.5
         this.def *= 1.5
         this.basicoAtk(this.move3)
-
-    }
-    if (move3[3] === 3) {
+    } else if (this.move3.tipo === 3) {
         textoAtualizando((`${this.nome} stunou ${inimigoSelecionado.nome}!`))
         inimigoSelecionado.speed *= 0.5
         inimigoSelecionado.atk *= 0.8
         inimigoSelecionado.def *= 0.8
         this.basicoAtk(this.move3)
-
-    }
-    if (move3[3] === 4) {
-        textoAtualizando((`${this.nome} se curo em 20 de HP`))
+    } else if (this.move3.tipo === 4) {
+        textoAtualizando((`${this.nome} se curou em 20 de HP`))
         this.hp += 20
         this.basicoAtk(this.move3)
     }
 }
 
-const persoLuffy = new Personagem(undefined, 'Luffy', 105, 6, 5.5, 16, ["Gomu Gomu no Gatling Gun", 3.5, 5], ["Gomu Gomu no Red Hawj", 4.5, 3], ["Gear 5", 5, 1, 2, "Bajran Gun"])
+const persoLuffy = new Personagem(undefined, 'Luffy', 105, 6, 5.5, 16, ["Gomu Gomu no Gatling Gun", 3.5, 5], ["Gomu Gomu no Red Hawk", 4.5, 3], ["Gear 5", 5, 1, 2, "Bajran Gun"])
 const persoZoro = new Personagem(undefined, 'Zoro', 95, 6, 6, 13, ["Oni Giri", 3, 5], ["Ichidai Sanzen Sekai", 5, 3], ["Ashura", 5, 1, 2, "Corte do The Big One Fodão"])
 const persoCrocodile = new Personagem(undefined, 'Crocodile', 90, 7, 5.5, 18, ["Desert Spada", 3.5, 5], ["Sables", 5, 2], ["Ground Death", 4.5, 2, 3])
 const persoSanji = new Personagem('aliado', 'Sanji', 105, 5.5, 7, 20, ["Parage Shoot", 3.5, 4], ["Diable Jambe", 4.5, 2], ["Ifrit Jambe", 4, 2, 4])
@@ -335,24 +316,22 @@ function ataqueAliadoSelecionado() {
     }
 }
 
-function ordemDeAtaque(move) {
+function ordemDeAtaque() {
     aliadoSorteado = personagensAliados[sortearNumero(0, personagensAliados.length)]
     inimigoSorteado = personagensInimigos[sortearNumero(0, personagensInimigos.length)]
     if (aliadoSelecionado.speed >= inimigoSorteado.speed) {
-        ataqueAliadoSelecionado(move)
+        ataqueAliadoSelecionado()
         inimigoSelecionado = aliadoSorteado
-        if (inimigoSelecionado.estado === 'morto') {
-            textoAtualizando(`(${inimigoSelecionado.nome} está morto, então não ataca!)`)
+        if (inimigoSelecionado.estado !== 'morto') {
+            ataqueInimigo()
         }
-        ataqueInimigo()
     } else {
         inimigoSelecionado = aliadoSorteado
         ataqueInimigo()
         inimigoSelecionado = inimigoSelecionadoTemp
-        if (inimigoSelecionado.estado === 'morto') {
-            textoAtualizando(`({${inimigoSelecionado.nome} está morto, então não ataca!})`)
+        if (aliadoSelecionado.estado !== 'morto') {
+            ataqueAliadoSelecionado()
         }
-        ataqueAliadoSelecionado(move)
     }
     resetarTudo()
 }
